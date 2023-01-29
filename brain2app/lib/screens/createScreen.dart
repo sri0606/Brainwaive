@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:brain2app/mainViewModel/mainViewModel.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
+import 'package:http/http.dart';
 
 import 'gameModeScreen.dart';
 
@@ -12,6 +13,8 @@ class SliderExample extends StatefulWidget {
 }
 
 var quizTitle = '';
+
+var quizQuestion = '';
 
 class _SliderExampleState extends State<SliderExample> {
   double _currentSliderValue = 5;
@@ -70,7 +73,7 @@ class _SliderExampleState extends State<SliderExample> {
                                 style: BorderStyle.none,
                               ),
                             ),
-                            hintText: 'Title',
+                            hintText: 'Set Title',
                           ),
 
                           // onchanged
@@ -102,8 +105,12 @@ class _SliderExampleState extends State<SliderExample> {
                                 style: BorderStyle.none,
                               ),
                             ),
-                            hintText: 'Question',
+                            hintText: 'Topic',
                           ),
+
+                          onChanged: (String value) {
+                            quizTitle = value;
+                          },
                         ),
                       ),
                     ],
@@ -166,13 +173,18 @@ class _SliderExampleState extends State<SliderExample> {
                         height: 50,
                         width: 125,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            // TODO: construct http request
+
                             // navigate to homeScreen
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      gameMode(title: quizTitle)),
+                                  builder: (context) => gameMode(
+                                      title: quizTitle,
+                                      quizTopic: quizQuestion,
+                                      numberOfQuestions:
+                                          _currentSliderValue.toInt())),
                             );
                           },
                           // make submit text larger

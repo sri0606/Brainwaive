@@ -1,21 +1,38 @@
+import 'dart:convert';
+
 import 'package:brain2app/screens/flashcardScreen.dart';
 import 'package:brain2app/screens/quiz/quizz_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:brain2app/mainViewModel/mainViewModel.dart';
 
+import 'package:http/http.dart' as http;
+
 class gameMode extends StatefulWidget {
   final String title;
+  final String quizTopic;
+  final int numberOfQuestions;
 
-  const gameMode({Key? key, required this.title}) : super(key: key);
+  const gameMode(
+      {Key? key,
+      required this.title,
+      required this.quizTopic,
+      required this.numberOfQuestions})
+      : super(key: key);
 
   @override
-  State<gameMode> createState() => _gameModeState(title: title);
+  State<gameMode> createState() => _gameModeState(
+      title: title, quizTopic: quizTopic, numberOfQuestions: numberOfQuestions);
 }
 
 class _gameModeState extends State<gameMode> {
   final String title;
+  final String quizTopic;
+  final int numberOfQuestions;
 
-  _gameModeState({required this.title});
+  _gameModeState(
+      {required this.title,
+      required this.quizTopic,
+      required this.numberOfQuestions});
 
   double _currentSliderValue = 5;
 
@@ -89,11 +106,14 @@ class _gameModeState extends State<gameMode> {
                       ),
                     ),
                   ),
-                  onTap: () {
+                  onTap: () async {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const QuizzScreen()),
+                          builder: (context) => QuizzScreen(
+                                quizTopic: quizTopic,
+                                numberOfQuestions: numberOfQuestions,
+                              )),
                     );
                   },
                 ),
