@@ -24,7 +24,9 @@ class QuizzScreen extends StatefulWidget {
 }
 
 class _QuizzScreenState extends State<QuizzScreen> {
-  _QuizzScreenState({required quizTopic, required numberOfQuestions});
+  final int numberOfQuestions;
+
+  _QuizzScreenState({required quizTopic, required this.numberOfQuestions});
 
   int question_pos = 0;
   int score = 0;
@@ -39,20 +41,27 @@ class _QuizzScreenState extends State<QuizzScreen> {
     _controller = PageController(initialPage: 0);
   }
 
-  Future<http.Response> fetchQuestions(String quizTopic) async {
-    var url = Uri.https(
-        'us-central1-brainwaive-76ded.cloudfunctions.net', '/gptinput');
-    var response = await http.post(url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          'question': quizTopic,
-          'howManyQuestions': 5,
-          'isQuestion': 'true'
-        }));
+  Future<http.Response> fetchQuestions(
+      String quizTopic, int numberOfQuestions) async {
+    if (mainViewModel.isQuizStarted == false) {
+      var url = Uri.https(
+          'us-central1-brainwaive-76ded.cloudfunctions.net', '/gptinput');
+      var response = await http.post(url,
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({
+            'question': quizTopic,
+            'howManyQuestions': numberOfQuestions.toString(),
+            'isQuestion': 'true'
+          }));
 
-    mainViewModel.quizQuestions = json.decode(response.body);
+      mainViewModel.quizQuestions = json.decode(response.body);
 
-    return response;
+      mainViewModel.isQuizStarted = true;
+
+      return response;
+    } else {
+      return http.Response('Quiz already started', 200);
+    }
   }
 
   @override
@@ -66,7 +75,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
           "Quiz",
           style: TextStyle(
             color: Colors.black,
-            fontSize: 22.0,
+            fontSize: 22,
           ),
         ),
         // remove shadow
@@ -163,7 +172,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: Text(
-                              "Question ${index + 1}/${mainViewModel.questions.length}",
+                              "Question ${mainViewModel.questionIndex}/${numberOfQuestions}",
                               textAlign: TextAlign.start,
                               style: TextStyle(
                                 color: Colors.black,
@@ -181,7 +190,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
                             width: double.infinity,
                             height: 200.0,
                             child: Text(
-                              "${mainViewModel.questions[index].question}",
+                              "${mainViewModel.questions[mainViewModel.questionIndex].question}",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 22.0,
@@ -191,7 +200,9 @@ class _QuizzScreenState extends State<QuizzScreen> {
                           for (int i = 0;
                               i <
                                   mainViewModel
-                                      .questions[index].answers!.length;
+                                      .questions[mainViewModel.questionIndex]
+                                      .answers!
+                                      .length;
                               i++)
                             Container(
                               width: double.infinity,
@@ -204,7 +215,10 @@ class _QuizzScreenState extends State<QuizzScreen> {
                                 ),
                                 fillColor: btnPressed
                                     ? mainViewModel
-                                            .questions[index].answers!.values
+                                            .questions[
+                                                mainViewModel.questionIndex]
+                                            .answers!
+                                            .values
                                             .toList()[i]
                                         ? Colors.green
                                         : Colors.red
@@ -212,7 +226,10 @@ class _QuizzScreenState extends State<QuizzScreen> {
                                 onPressed: !answered
                                     ? () {
                                         if (mainViewModel
-                                            .questions[index].answers!.values
+                                            .questions[
+                                                mainViewModel.questionIndex]
+                                            .answers!
+                                            .values
                                             .toList()[i]) {
                                           score++;
                                           print("yes");
@@ -226,7 +243,10 @@ class _QuizzScreenState extends State<QuizzScreen> {
                                       }
                                     : null,
                                 child: Text(
-                                    mainViewModel.questions[index].answers!.keys
+                                    mainViewModel
+                                        .questions[mainViewModel.questionIndex]
+                                        .answers!
+                                        .keys
                                         .toList()[i],
                                     style: TextStyle(
                                       color: Colors.white,
@@ -255,6 +275,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
 
                                   setState(() {
                                     btnPressed = false;
+                                    mainViewModel.questionIndex++;
                                   });
                                 }
                               },
@@ -285,7 +306,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
 
         // Future that needs to be resolved
         // inorder to display something on the Canvas
-        future: fetchQuestions(quizQuestion),
+        future: fetchQuestions(quizQuestion, this.numberOfQuestions),
       ),
     );
   }
