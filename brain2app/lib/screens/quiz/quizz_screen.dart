@@ -30,18 +30,25 @@ class _QuizzScreenState extends State<QuizzScreen> {
     return Scaffold(
       //app bar
       appBar: AppBar(
-        title: Text("Quiz"),
-        centerTitle: true,
-        backgroundColor: AppColor.pripmaryColor,
-        //back button
+        // make background color FAFAFA
+        backgroundColor: const Color(0xFFFAFAFA),
+        title: Text(
+          "Quiz",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 22.0,
+          ),
+        ),
+        // remove shadow
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.chevron_left, size: 40),
+          color: Colors.black,
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
-      backgroundColor: AppColor.pripmaryColor,
       body: Padding(
           padding: const EdgeInsets.all(18.0),
           child: PageView.builder(
@@ -68,13 +75,13 @@ class _QuizzScreenState extends State<QuizzScreen> {
                       "Question ${index + 1}/${questions.length}",
                       textAlign: TextAlign.start,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 28.0,
                       ),
                     ),
                   ),
                   Divider(
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                   SizedBox(
                     height: 10.0,
@@ -85,7 +92,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
                     child: Text(
                       "${questions[index].question}",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 22.0,
                       ),
                     ),
@@ -104,7 +111,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
                             ? questions[index].answers!.values.toList()[i]
                                 ? Colors.green
                                 : Colors.red
-                            : AppColor.secondaryColor,
+                            : Colors.black,
                         onPressed: !answered
                             ? () {
                                 if (questions[index]
@@ -132,30 +139,34 @@ class _QuizzScreenState extends State<QuizzScreen> {
                   SizedBox(
                     height: 40.0,
                   ),
-                  RawMaterialButton(
-                    onPressed: () {
-                      if (_controller!.page?.toInt() == questions.length - 1) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ResultScreen(score)));
-                      } else {
-                        _controller!.nextPage(
-                            duration: Duration(milliseconds: 250),
-                            curve: Curves.easeInExpo);
+                  Container(
+                    width: 150,
+                    child: RawMaterialButton(
+                      onPressed: () {
+                        if (_controller!.page?.toInt() ==
+                            questions.length - 1) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ResultScreen(score)));
+                        } else {
+                          _controller!.nextPage(
+                              duration: Duration(milliseconds: 250),
+                              curve: Curves.easeInExpo);
 
-                        setState(() {
-                          btnPressed = false;
-                        });
-                      }
-                    },
-                    shape: StadiumBorder(),
-                    fillColor: Colors.blue,
-                    padding: EdgeInsets.all(18.0),
-                    elevation: 0.0,
-                    child: Text(
-                      btnText,
-                      style: TextStyle(color: Colors.white),
+                          setState(() {
+                            btnPressed = false;
+                          });
+                        }
+                      },
+                      shape: StadiumBorder(),
+                      fillColor: Colors.black,
+                      padding: EdgeInsets.all(18.0),
+                      elevation: 0.0,
+                      child: Text(
+                        btnText,
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
                     ),
                   )
                 ],

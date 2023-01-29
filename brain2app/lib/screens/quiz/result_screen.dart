@@ -17,7 +17,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.pripmaryColor,
+      backgroundColor: Colors.white,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -25,10 +25,10 @@ class _ResultScreenState extends State<ResultScreen> {
           SizedBox(
             width: double.infinity,
             child: Text(
-              "Congratulations",
+              "Well done.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 40.0,
                 fontWeight: FontWeight.bold,
               ),
@@ -38,16 +38,16 @@ class _ResultScreenState extends State<ResultScreen> {
             height: 45.0,
           ),
           Text(
-            "You Score is",
-            style: TextStyle(color: Colors.white, fontSize: 34.0),
+            "Your score is",
+            style: TextStyle(color: Colors.black, fontSize: 34.0),
           ),
           SizedBox(
             height: 20.0,
           ),
           Text(
-            "${widget.score}",
+            "${widget.score} / 9",
             style: TextStyle(
-              color: Colors.orange,
+              color: Colors.black,
               fontSize: 85.0,
               fontWeight: FontWeight.bold,
             ),
@@ -55,15 +55,31 @@ class _ResultScreenState extends State<ResultScreen> {
           SizedBox(
             height: 100.0,
           ),
-          ElevatedButton(
-            onPressed: () {
-              // Pop two screens
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text(
-              "Return to Main Menu",
-              style: TextStyle(color: Colors.white),
+          SizedBox(
+            height: 50,
+            width: 200,
+            child: ElevatedButton(
+              onPressed: () {
+                // navigate to homeScreen
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              // make text larger
+              child: Text(
+                "Back to Home",
+                style: TextStyle(
+                  fontSize: 17,
+                ),
+              ),
+              // make color black
+              style: ElevatedButton.styleFrom(
+                primary: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+              ),
             ),
           ),
         ],

@@ -33,6 +33,7 @@ dependencies:
   flip_card: ^0.7.0
   flutter:
     sdk: flutter
+  http: ^0.13.5
   provider: ^6.0.5
   syncfusion_flutter_sliders: ^20.4.44
 
