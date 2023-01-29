@@ -14,8 +14,4 @@ class MainViewModel with StateNotifier {
 
   // quizQuestions Data
   List<QuestionModel> questions = [];
-
-  bool isQuizStarted = false;
-
-  int questionIndex = 0;
 }

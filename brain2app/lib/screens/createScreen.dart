@@ -1,7 +1,10 @@
+import 'dart:convert';
+
+import 'package:brain2app/screens/quiz/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:brain2app/mainViewModel/mainViewModel.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 import 'gameModeScreen.dart';
 
@@ -175,6 +178,89 @@ class _SliderExampleState extends State<SliderExample> {
                         child: ElevatedButton(
                           onPressed: () async {
                             // TODO: construct http request
+                            Future<http.Response> fetchQuestions(
+                                String quizTopic) async {
+                              var url = Uri.https(
+                                  'us-central1-brainwaive-76ded.cloudfunctions.net',
+                                  '/gptinput');
+                              var response = await http.post(url,
+                                  headers: {"Content-Type": "application/json"},
+                                  body: json.encode({
+                                    'question': quizTitle,
+                                    'howManyQuestions': 5,
+                                    'isQuestion': 'true'
+                                  }));
+
+                              mainViewModel.quizQuestions =
+                                  json.decode(response.body);
+
+                              return response;
+                            }
+
+                            var response = await fetchQuestions(quizQuestion);
+
+                            // parse response into questions
+                            for (var i = 0;
+                                i < mainViewModel.quizQuestions.length;
+                                i++) {
+                              // find the correct answer, look at fifth element in list
+                              int correct = 0;
+
+                              // find first character in string
+                              var firstEntry =
+                                  mainViewModel.quizQuestions[i].entries.first;
+                              // what does 1) jdslfjklsd
+                              var firstKey = firstEntry.key;
+                              // list 5 items
+                              var firstValue = firstEntry.value;
+
+                              if (mainViewModel.quizQuestions[i].entries.first
+                                          .value[4]
+                                          .substring(0, 1) ==
+                                      'A' ||
+                                  mainViewModel.quizQuestions[i].entries.first
+                                          .value[4]
+                                          .substring(0, 1) ==
+                                      'a') {
+                                correct = 0;
+                              } else if (mainViewModel.quizQuestions[i].entries
+                                          .first.value[4]
+                                          .substring(0, 1) ==
+                                      'B' ||
+                                  mainViewModel.quizQuestions[i].entries.first
+                                          .value[4]
+                                          .substring(0, 1) ==
+                                      'b') {
+                                correct = 1;
+                              } else if (mainViewModel.quizQuestions[i].entries
+                                          .first.value[4]
+                                          .substring(0, 1) ==
+                                      'C' ||
+                                  mainViewModel.quizQuestions[i].entries.first
+                                          .value[4]
+                                          .substring(0, 1) ==
+                                      'c') {
+                                correct = 2;
+                              } else if (mainViewModel.quizQuestions[i].entries
+                                          .first.value[4]
+                                          .substring(0, 1) ==
+                                      'D' ||
+                                  mainViewModel.quizQuestions[i].entries.first
+                                          .value[4]
+                                          .substring(0, 1) ==
+                                      'd') {
+                                correct = 3;
+                              }
+
+                              // create new QuestionModel object
+                              mainViewModel.questions
+                                  .add(QuestionModel(firstEntry.key, {
+                                firstValue[0]: correct == 0 ? true : false,
+                                firstValue[1]: correct == 1 ? true : false,
+                                firstValue[2]: correct == 2 ? true : false,
+                                firstValue[3]: correct == 3 ? true : false,
+                              }));
+                            }
 
                             // navigate to homeScreen
                             Navigator.push(

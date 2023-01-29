@@ -24,9 +24,7 @@ class QuizzScreen extends StatefulWidget {
 }
 
 class _QuizzScreenState extends State<QuizzScreen> {
-  final int numberOfQuestions;
-
-  _QuizzScreenState({required quizTopic, required this.numberOfQuestions});
+  _QuizzScreenState({required quizTopic, required numberOfQuestions});
 
   int question_pos = 0;
   int score = 0;
@@ -41,273 +39,163 @@ class _QuizzScreenState extends State<QuizzScreen> {
     _controller = PageController(initialPage: 0);
   }
 
-  Future<http.Response> fetchQuestions(
-      String quizTopic, int numberOfQuestions) async {
-    if (mainViewModel.isQuizStarted == false) {
-      var url = Uri.https(
-          'us-central1-brainwaive-76ded.cloudfunctions.net', '/gptinput');
-      var response = await http.post(url,
-          headers: {"Content-Type": "application/json"},
-          body: json.encode({
-            'question': quizTopic,
-            'howManyQuestions': numberOfQuestions.toString(),
-            'isQuestion': 'true'
-          }));
-
-      mainViewModel.quizQuestions = json.decode(response.body);
-
-      mainViewModel.isQuizStarted = true;
-
-      return response;
-    } else {
-      return http.Response('Quiz already started', 200);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //app bar
-      appBar: AppBar(
-        // make background color FAFAFA
-        backgroundColor: const Color(0xFFFAFAFA),
-        title: Text(
-          "Quiz",
-          style: TextStyle(
+        //app bar
+        appBar: AppBar(
+          // make background color FAFAFA
+          backgroundColor: const Color(0xFFFAFAFA),
+          title: Text(
+            "Quiz",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22.0,
+            ),
+          ),
+          // remove shadow
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.chevron_left, size: 40),
             color: Colors.black,
-            fontSize: 22,
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
         ),
-        // remove shadow
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left, size: 40),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-
-      body: FutureBuilder(
-        builder: (ctx, snapshot) {
-          // Checking if future is resolved or not
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If we got an error
-            if (snapshot.hasData) {
-              // store response in mainViewModel
-
-              // parse response into questions
-              for (var i = 0; i < mainViewModel.quizQuestions.length; i++) {
-                // find the correct answer, look at fifth element in list
-                int correct = 0;
-
-                // find first character in string
-                var firstEntry = mainViewModel.quizQuestions[i].entries.first;
-                // what does 1) jdslfjklsd
-                var firstKey = firstEntry.key;
-                // list 5 items
-                var firstValue = firstEntry.value;
-
-                if (mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'A' ||
-                    mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'a') {
-                  correct = 0;
-                } else if (mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'B' ||
-                    mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'b') {
-                  correct = 1;
-                } else if (mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'C' ||
-                    mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'c') {
-                  correct = 2;
-                } else if (mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'D' ||
-                    mainViewModel.quizQuestions[i].entries.first.value[4]
-                            .substring(0, 1) ==
-                        'd') {
-                  correct = 3;
-                }
-
-                // create new QuestionModel object
-                mainViewModel.questions.add(QuestionModel(firstEntry.key, {
-                  firstValue[0]: correct == 0 ? true : false,
-                  firstValue[1]: correct == 1 ? true : false,
-                  firstValue[2]: correct == 2 ? true : false,
-                  firstValue[3]: correct == 3 ? true : false,
-                }));
-              }
-              // Extracting data from snapshot object
-              final data = snapshot.data as http.Response;
-              return Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: PageView.builder(
-                    controller: _controller!,
-                    onPageChanged: (page) {
-                      if (page == mainViewModel.questions.length - 1) {
-                        setState(() {
-                          btnText = "See Results";
-                        });
-                      }
+        body:
+            // store response in mainViewModel
+            Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: PageView.builder(
+                  controller: _controller!,
+                  onPageChanged: (page) {
+                    if (page == mainViewModel.questions.length - 1) {
                       setState(() {
-                        answered = false;
+                        btnText = "See Results";
                       });
-                    },
-                    physics: new NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              "Question ${mainViewModel.questionIndex}/${numberOfQuestions}",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 28.0,
-                              ),
+                    }
+                    setState(() {
+                      answered = false;
+                    });
+                  },
+                  physics: new NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            "Question ${index + 1}/${mainViewModel.questions.length}",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 28.0,
                             ),
                           ),
-                          Divider(
-                            color: Colors.black,
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 200.0,
-                            child: Text(
-                              "${mainViewModel.questions[mainViewModel.questionIndex].question}",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 22.0,
-                              ),
+                        ),
+                        Divider(
+                          color: Colors.black,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 200.0,
+                          child: Text(
+                            "${mainViewModel.questions[index].question}",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 22.0,
                             ),
                           ),
-                          for (int i = 0;
-                              i <
-                                  mainViewModel
-                                      .questions[mainViewModel.questionIndex]
-                                      .answers!
-                                      .length;
-                              i++)
-                            Container(
-                              width: double.infinity,
-                              height: 50.0,
-                              margin: EdgeInsets.only(
-                                  bottom: 20.0, left: 12.0, right: 12.0),
-                              child: RawMaterialButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                fillColor: btnPressed
-                                    ? mainViewModel
-                                            .questions[
-                                                mainViewModel.questionIndex]
-                                            .answers!
-                                            .values
-                                            .toList()[i]
-                                        ? Colors.green
-                                        : Colors.red
-                                    : Colors.black,
-                                onPressed: !answered
-                                    ? () {
-                                        if (mainViewModel
-                                            .questions[
-                                                mainViewModel.questionIndex]
-                                            .answers!
-                                            .values
-                                            .toList()[i]) {
-                                          score++;
-                                          print("yes");
-                                        } else {
-                                          print("no");
-                                        }
-                                        setState(() {
-                                          btnPressed = true;
-                                          answered = true;
-                                        });
-                                      }
-                                    : null,
-                                child: Text(
-                                    mainViewModel
-                                        .questions[mainViewModel.questionIndex]
-                                        .answers!
-                                        .keys
-                                        .toList()[i],
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18.0,
-                                    )),
-                              ),
-                            ),
-                          SizedBox(
-                            height: 40.0,
-                          ),
+                        ),
+                        for (int i = 0;
+                            i < mainViewModel.questions[index].answers!.length;
+                            i++)
                           Container(
-                            width: 150,
+                            width: double.infinity,
+                            height: 50.0,
+                            margin: EdgeInsets.only(
+                                bottom: 20.0, left: 12.0, right: 12.0),
                             child: RawMaterialButton(
-                              onPressed: () {
-                                if (_controller!.page?.toInt() ==
-                                    mainViewModel.questions.length - 1) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ResultScreen(score)));
-                                } else {
-                                  _controller!.nextPage(
-                                      duration: Duration(milliseconds: 250),
-                                      curve: Curves.easeInExpo);
-
-                                  setState(() {
-                                    btnPressed = false;
-                                    mainViewModel.questionIndex++;
-                                  });
-                                }
-                              },
-                              shape: StadiumBorder(),
-                              fillColor: Colors.black,
-                              padding: EdgeInsets.all(18.0),
-                              elevation: 0.0,
-                              child: Text(
-                                btnText,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
+                              fillColor: btnPressed
+                                  ? mainViewModel
+                                          .questions[index].answers!.values
+                                          .toList()[i]
+                                      ? Colors.green
+                                      : Colors.red
+                                  : Colors.black,
+                              onPressed: !answered
+                                  ? () {
+                                      if (mainViewModel
+                                          .questions[index].answers!.values
+                                          .toList()[i]) {
+                                        score++;
+                                        print("yes");
+                                      } else {
+                                        print("no");
+                                      }
+                                      setState(() {
+                                        btnPressed = true;
+                                        answered = true;
+                                      });
+                                    }
+                                  : null,
+                              child: Text(
+                                  mainViewModel.questions[index].answers!.keys
+                                      .toList()[i],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                  )),
                             ),
-                          )
-                        ],
-                      );
-                    },
-                    itemCount: mainViewModel.questions.length,
-                  ));
-            }
-          }
+                          ),
+                        SizedBox(
+                          height: 40.0,
+                        ),
+                        Container(
+                          width: 150,
+                          child: RawMaterialButton(
+                            onPressed: () {
+                              if (_controller!.page?.toInt() ==
+                                  mainViewModel.questions.length - 1) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ResultScreen(score)));
+                              } else {
+                                _controller!.nextPage(
+                                    duration: Duration(milliseconds: 250),
+                                    curve: Curves.easeInExpo);
 
-          // Displaying LoadingSpinner to indicate waiting state
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-
-        // Future that needs to be resolved
-        // inorder to display something on the Canvas
-        future: fetchQuestions(quizQuestion, this.numberOfQuestions),
-      ),
-    );
+                                setState(() {
+                                  btnPressed = false;
+                                });
+                              }
+                            },
+                            shape: StadiumBorder(),
+                            fillColor: Colors.black,
+                            padding: EdgeInsets.all(18.0),
+                            elevation: 0.0,
+                            child: Text(
+                              btnText,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  },
+                  itemCount: mainViewModel.questions.length,
+                )));
   }
 }
