@@ -23,7 +23,17 @@ class _gameModeState extends State<gameMode> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        // make background color FAFAFA
+        backgroundColor: const Color(0xFFFAFAFA),
+        // remove shadow
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left, size: 40),
+          color: Colors.black,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SafeArea(
         child: Container(

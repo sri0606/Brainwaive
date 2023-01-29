@@ -16,7 +16,7 @@ class _QuizzScreenState extends State<QuizzScreen> {
   int score = 0;
   bool btnPressed = false;
   PageController? _controller;
-  String btnText = "Next Question";
+  String btnText = "Next";
   bool answered = false;
   @override
   void initState() {

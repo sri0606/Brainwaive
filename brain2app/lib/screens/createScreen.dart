@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:brain2app/mainViewModel/mainViewModel.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 import 'gameModeScreen.dart';
 
@@ -129,45 +130,44 @@ class _SliderExampleState extends State<SliderExample> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Text 5 is bold
-                      const Text(
-                        '5',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                       Expanded(
-                        child: Slider(
-                          value: _currentSliderValue,
-                          max: 20,
-                          min: 5,
-                          divisions: 3,
-                          label: _currentSliderValue.round().toString(),
-                          onChanged: (double value) {
+                        child:
+                            // change color of tooltip to black
+
+                            SfSlider(
+                          min: 5.0,
+                          max: 20.0,
+                          value: _currentSliderValue.roundToDouble(),
+                          interval: 5,
+                          showTicks: true,
+                          showLabels: true,
+                          enableTooltip: true,
+                          tooltipShape: SfPaddleTooltipShape(),
+                          minorTicksPerInterval: 1,
+                          activeColor: Colors.black,
+                          inactiveColor: Colors.grey,
+                          onChanged: (dynamic value) {
                             setState(() {
                               _currentSliderValue = value;
                             });
                           },
-                          activeColor: Colors.black,
-                          inactiveColor: Colors.grey,
-                        ),
-                      ),
-                      // Text 20 is bold
-                      const Text(
-                        '20',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
+                  ),
+                  SizedBox(
+                    height: 40,
                   ),
                   // button for submit
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
+                      SizedBox(
+                        height: 50,
+                        width: 125,
                         child: ElevatedButton(
                           onPressed: () {
-                            // navigate to gameModeScreen
+                            // navigate to homeScreen
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -175,10 +175,19 @@ class _SliderExampleState extends State<SliderExample> {
                                       gameMode(title: quizTitle)),
                             );
                           },
-                          child: const Text('Submit'),
-                          // color black
+                          // make submit text larger
+                          child: const Text(
+                            'Submit',
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                          // make color black
                           style: ElevatedButton.styleFrom(
                             primary: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
                           ),
                         ),
                       ),
